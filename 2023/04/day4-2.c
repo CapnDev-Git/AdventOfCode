@@ -4,7 +4,6 @@
 #include <string.h>
 
 #define MAX_NUMBERS 64
-#define MAX_WON 4096
 #define MAX_CARDS 220
 
 /* Code by Eliott 'The Shark' Flechtner, 2023/12/04 */
@@ -20,23 +19,20 @@ static void get_numbers(char *str, int *arr, size_t *len)
         n = strtok_r(NULL, " ", &saveptr);
     }
 }
-// static int get_winning_points(FILE *fptr) {
-static int get_winning_points(FILE *fptr, int *counts, size_t num_cards) {
+
+static int get_winning_points(FILE *fptr) {
     int res = 0;
     char *line = NULL;
     size_t len = 0;
     ssize_t nbytes = 0;
+  
+    // Get the winning numbers
+    size_t len_lookup = 0;
+    int *lookup = calloc(sizeof(int), MAX_CARDS);
+    for (size_t i = 0; i < MAX_CARDS; i++)
+        lookup[i] = 1;
 
-    // Prepare a history of wins
-    //int *won_history = malloc(sizeof(int) * MAX_WON);
-    //won_history[0] = 1;
-    //printf("won_history[0]=1\n");
-    //int *lookup = calloc(sizeof(int), MAX_WON);
-
-    // Read every line of the given file
-    //size_t game_id = 1;
-    //size_t k = 1;
-    //size_t prev_k = 0;
+    int id = 1;
     while ((nbytes = getline(&line, &len, fptr)) != -1)
     {
         // Remove the game header
@@ -59,67 +55,43 @@ static int get_winning_points(FILE *fptr, int *counts, size_t num_cards) {
         int *card_numbers = malloc(sizeof(int) * MAX_NUMBERS);
         get_numbers(card_numbers_str, card_numbers, &l2);
 
-        // Detect the winning numbers from the card numbers
+        // Count how many cards were won
         int won = 0;
         for (size_t i = 0; i < l2; ++i)
-        {
             for (size_t j = 0; j < l1; ++j)
-            {
                 if (card_numbers[i] == winning_numbers[j])
-                {
                     won++;
-                    break;
-                }
-            }
-        }
-
-
+        
+        // Count (exponentially) the amount of copy cards won
         if (won)
-        {
-            for (size_t i = 0; i < num_cards; ++i)
-            {
-                if (card_numbers[0] == i + 1)
-                {
-                    counts[i] += won;
-                    break;
-                }
-            }
-        }
-
-        res += won;
+            for (int i = id + 1; i < id + won + 1; i++)
+                lookup[i-1] += lookup[id-1];
 
         // Free the arrays
         free(winning_numbers);
         free(card_numbers);
+        
+        // Increase the game ID
+        id++;
     }
 
-    // Free the allocated line (in getline)
+    // Update the result
+    for (size_t i = 0; i < MAX_CARDS; i++)
+        res += lookup[i];
+
+    // Free the allocated line & array
     free(line);
+    free(lookup);
 
     // Return the sum of valid game IDs
     return res;
-}
-
-// Function to update counts array based on card numbers
-static void update_counts(int *counts, size_t num_cards, int *card_numbers, size_t l) {
-    for (size_t i = 0; i < num_cards; ++i) {
-        for (size_t j = 0; j < l; ++j) {
-            if (card_numbers[j] == i + 1) {
-                counts[i]++;
-                break;
-            }
-        }
-    }
 }
 
 int main(int argc, char *argv[])
 {
     // Parse the script inputs
     if (argc != 2)
-    {
         errx(1, "Usage: %s <filename>\n", argv[0]);
-        return 1;
-    }
 
     // Open the file for reading
     FILE *fptr = fopen(argv[argc - 1], "r");
@@ -127,41 +99,8 @@ int main(int argc, char *argv[])
         errx(1, "main: could not open given file!");
 
     // Calculate and print the sum of game IDs that are valid
-    //int sum = get_winning_points(fptr);
-    //printf("winning points=%d\n", sum);
-
-    // Initialize counts for each card
-    int counts[MAX_CARDS] = {0};
-
-    // Loop for processing copies
-    while (1)
-    {
-        int copies_won = 0;  // Track the total number of copies won in this iteration
-
-        // Iterate over each card
-        for (size_t i = 0; i < MAX_CARDS; ++i) {
-            // Check if this card wins copies
-            if (counts[i] > 1) {  // Updated condition to check for copies
-                // Update the counts for the copies won
-                for (size_t j = 1; j < counts[i]; ++j) {
-                    update_counts(counts, MAX_CARDS, card_numbers[i], l);  // Assuming update_counts is appropriately modified
-                    copies_won += counts[i] - 1;  // Subtract 1 for the original card
-                }
-                counts[i] = 1;  // Set the count of the original card to 1
-            }
-        }
-
-        // Break the loop if no more copies are won
-        if (copies_won == 0) {
-            break;
-        }
-
-        // Add the copies to the total sum
-        sum += copies_won;
-    }
-
-    // Print the total number of scratchcards
-    printf("total scratchcards=%d\n", sum);
+    int sum = get_winning_points(fptr);
+    printf("Total scratchcards = %d\n", sum);
 
     // Close the file
     fclose(fptr);

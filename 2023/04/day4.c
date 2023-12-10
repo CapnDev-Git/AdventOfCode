@@ -54,7 +54,6 @@ static int get_winning_points(FILE *fptr) {
         {
             for (size_t j = 0; j < l1; ++j)
             {
-                // 
                 if (card_numbers[i] == winning_numbers[j])
                 {
                     won = won ? won * 2 : 1;
@@ -94,7 +93,7 @@ int main(int argc, char *argv[])
 
     // Calculate and print the sum of game IDs that are valid
     int sum = get_winning_points(fptr);
-    printf("winning points=%d\n", sum);
+    printf("Total winning points = %d\n", sum);
 
     // Close the file
     fclose(fptr);
