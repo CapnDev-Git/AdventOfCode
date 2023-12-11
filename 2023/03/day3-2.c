@@ -1,7 +1,7 @@
 #include <ctype.h>
+#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <err.h>
 
 struct grid_info
 {
@@ -21,7 +21,6 @@ struct number
     struct point pt;
     size_t len;
 };
-
 
 static char **build_grid(FILE *fptr, size_t *rows, size_t *cols)
 {
@@ -102,14 +101,14 @@ static struct grid_info init_grid_info(FILE *fptr)
 
 static int is_valid_pos(struct grid_info gi, size_t x, size_t y)
 {
-    return x >= 0 && y >= 0 && x <= gi.rows-1 && y <= gi.cols-1;
+    return x >= 0 && y >= 0 && x <= gi.rows - 1 && y <= gi.cols - 1;
 }
 
 static void replace_dots(struct grid_info gi, struct number nb)
 {
     for (size_t i = 0; i < nb.len; ++i)
     {
-        if (is_valid_pos(gi, nb.pt.x, nb.pt.y+i))
+        if (is_valid_pos(gi, nb.pt.x, nb.pt.y + i))
             gi.grid[nb.pt.x][nb.pt.y + i] = '.';
         else
             printf("(%zu, %zu) unreachable\n", nb.pt.x, nb.pt.y);
@@ -122,30 +121,34 @@ static struct point search_other_number(struct grid_info gi, struct point gear)
 
     // Check all 8 around the '*' char for the other number
 
-    // Check the 3 before 
+    // Check the 3 before
     for (int i = -1; i < 2; ++i)
     {
-        if (is_valid_pos(gi, gear.x+i, gear.y-1) && isdigit(gi.grid[gear.x+i][gear.y-1]))
-            return (struct point){gear.x+i, gear.y-1};
+        if (is_valid_pos(gi, gear.x + i, gear.y - 1)
+            && isdigit(gi.grid[gear.x + i][gear.y - 1]))
+            return (struct point){ gear.x + i, gear.y - 1 };
     }
 
-    // Check the 2 before 
+    // Check the 2 before
     for (int i = -1; i < 2; ++i)
     {
-        if (is_valid_pos(gi, gear.x+i, gear.y+1) && isdigit(gi.grid[gear.x+i][gear.y+1]))
-            return (struct point){gear.x+i, gear.y+1};
+        if (is_valid_pos(gi, gear.x + i, gear.y + 1)
+            && isdigit(gi.grid[gear.x + i][gear.y + 1]))
+            return (struct point){ gear.x + i, gear.y + 1 };
     }
 
     // Check the spot above
-    if (is_valid_pos(gi, gear.x-1, gear.y) && isdigit(gi.grid[gear.x-1][gear.y]))
-        return (struct point){gear.x-1, gear.y};
+    if (is_valid_pos(gi, gear.x - 1, gear.y)
+        && isdigit(gi.grid[gear.x - 1][gear.y]))
+        return (struct point){ gear.x - 1, gear.y };
 
     // Check the spot below
-    if (is_valid_pos(gi, gear.x+1, gear.y) && isdigit(gi.grid[gear.x+1][gear.y]))
-        return (struct point){gear.x+1, gear.y};
+    if (is_valid_pos(gi, gear.x + 1, gear.y)
+        && isdigit(gi.grid[gear.x + 1][gear.y]))
+        return (struct point){ gear.x + 1, gear.y };
 
     // If no other number was found
-    return (struct point){-1, -1};
+    return (struct point){ -1, -1 };
 }
 
 static struct point check_neighbors(struct grid_info gi, struct number nb)
@@ -153,28 +156,31 @@ static struct point check_neighbors(struct grid_info gi, struct number nb)
     // Check the vertical 2 spots before the number
     for (int i = -1; i < 2; ++i)
     {
-        if (is_valid_pos(gi, nb.pt.x+i, nb.pt.y-1) && gi.grid[nb.pt.x+i][nb.pt.y-1] == '*')
-            return (struct point){nb.pt.x+i, nb.pt.y-1};
+        if (is_valid_pos(gi, nb.pt.x + i, nb.pt.y - 1)
+            && gi.grid[nb.pt.x + i][nb.pt.y - 1] == '*')
+            return (struct point){ nb.pt.x + i, nb.pt.y - 1 };
     }
 
     // Check the vertical 2 spots after the number
     size_t yf = nb.pt.y + nb.len - 1;
     for (int i = -1; i < 2; ++i)
     {
-        if (is_valid_pos(gi, nb.pt.x+i, yf+1) && gi.grid[nb.pt.x+i][yf+1] == '*')
-            return (struct point){nb.pt.x+i, yf+1};
+        if (is_valid_pos(gi, nb.pt.x + i, yf + 1)
+            && gi.grid[nb.pt.x + i][yf + 1] == '*')
+            return (struct point){ nb.pt.x + i, yf + 1 };
     }
 
     // Loop for checking below the number
     for (size_t i = 0; i < nb.len; ++i)
     {
         // Check all below
-        if (is_valid_pos(gi, nb.pt.x+1, nb.pt.y+i) && gi.grid[nb.pt.x+1][nb.pt.y+i] == '*')
-            return (struct point){nb.pt.x+1, nb.pt.y+i};
+        if (is_valid_pos(gi, nb.pt.x + 1, nb.pt.y + i)
+            && gi.grid[nb.pt.x + 1][nb.pt.y + i] == '*')
+            return (struct point){ nb.pt.x + 1, nb.pt.y + i };
     }
 
     // No '*' characters found around the given number substring
-    return (struct point){-1, -1};
+    return (struct point){ -1, -1 };
 }
 
 static int get_part_numbers(FILE *fptr)
@@ -213,22 +219,27 @@ static int get_part_numbers(FILE *fptr)
                         size_t beg = other.y;
                         size_t end = other.y;
 
-                        // Find the beginning & end pointers for the other number
-                        while (is_valid_pos(gi, other.x, beg) && isdigit(gi.grid[other.x][beg]))
+                        // Find the beginning & end pointers for the other
+                        // number
+                        while (is_valid_pos(gi, other.x, beg)
+                               && isdigit(gi.grid[other.x][beg]))
                             beg--;
-                        while (is_valid_pos(gi, other.x, end) && isdigit(gi.grid[other.x][end]))
+                        while (is_valid_pos(gi, other.x, end)
+                               && isdigit(gi.grid[other.x][end]))
                             end++;
 
                         // Build the other number
-                        size_t k = beg+1;
+                        size_t k = beg + 1;
 
-                        while (end-k > 0)
+                        while (end - k > 0)
                             n2 = n2 * 10 + (gi.grid[other.x][k++] - '0');
                         printf("%d\n", n2);
 
-                        // Add to the result & remove the asterix & the second number
+                        // Add to the result & remove the asterix & the second
+                        // number
                         res += n1 * n2;
-                        struct number other_number = init_number(other.x, beg+1, end-beg-1);
+                        struct number other_number =
+                            init_number(other.x, beg + 1, end - beg - 1);
                         replace_dots(gi, other_number);
                     }
                     else
@@ -246,7 +257,8 @@ static int get_part_numbers(FILE *fptr)
     return res;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     // Parse the script inputs
     if (argc != 2)
     {

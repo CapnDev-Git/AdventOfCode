@@ -1,7 +1,7 @@
 #include <ctype.h>
+#include <err.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <err.h>
 
 char **build_grid(FILE *fptr, size_t *rows, size_t *cols)
 {
@@ -55,34 +55,34 @@ void free_grid(char **grid, size_t rows)
     free(grid);
 }
 
-static int check_neighbors(char **grid, size_t rows, size_t cols, size_t x, size_t y, size_t length)
+static int check_neighbors(char **grid, size_t rows, size_t cols, size_t x,
+                           size_t y, size_t length)
 {
     // Check the vertical 3 spots before the number
-    if ((y && grid[x][y-1] != '.')
-            || (x && y && grid[x-1][y-1] != '.')
-            || (x != rows-1 && y && grid[x+1][y-1] != '.'))
+    if ((y && grid[x][y - 1] != '.') || (x && y && grid[x - 1][y - 1] != '.')
+        || (x != rows - 1 && y && grid[x + 1][y - 1] != '.'))
         return 1;
 
     // Check vertical 3 spots after the number 3
     size_t yf = y + length - 1;
-    if ((yf != cols-1 && grid[x][yf+1] != '.')
-            || (x && yf != cols-1 && grid[x-1][yf+1] != '.')
-            || (x != rows-1 && yf != cols-1 && grid[x+1][yf+1] != '.'))
+    if ((yf != cols - 1 && grid[x][yf + 1] != '.')
+        || (x && yf != cols - 1 && grid[x - 1][yf + 1] != '.')
+        || (x != rows - 1 && yf != cols - 1 && grid[x + 1][yf + 1] != '.'))
         return 1;
 
     // Loop for checking above and below the number
     for (size_t i = 0; i < length; ++i)
     {
-        // 
+        //
         if (x)
         {
-            if (grid[x-1][y+i] != '.')
+            if (grid[x - 1][y + i] != '.')
                 return 1;
         }
 
-        if (x != rows-1)
+        if (x != rows - 1)
         {
-            if (grid[x+1][y+i] != '.')
+            if (grid[x + 1][y + i] != '.')
                 return 1;
         }
     }
@@ -125,7 +125,8 @@ static int get_part_numbers(FILE *fptr)
     return res;
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     // Parse the script inputs
     if (argc != 2)
     {

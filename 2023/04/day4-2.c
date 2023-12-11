@@ -20,12 +20,13 @@ static void get_numbers(char *str, int *arr, size_t *len)
     }
 }
 
-static int get_winning_points(FILE *fptr) {
+static int get_winning_points(FILE *fptr)
+{
     int res = 0;
     char *line = NULL;
     size_t len = 0;
     ssize_t nbytes = 0;
-  
+
     // Get the winning numbers
     size_t len_lookup = 0;
     int *lookup = calloc(sizeof(int), MAX_CARDS);
@@ -61,16 +62,16 @@ static int get_winning_points(FILE *fptr) {
             for (size_t j = 0; j < l1; ++j)
                 if (card_numbers[i] == winning_numbers[j])
                     won++;
-        
+
         // Count (exponentially) the amount of copy cards won
         if (won)
             for (int i = id + 1; i < id + won + 1; i++)
-                lookup[i-1] += lookup[id-1];
+                lookup[i - 1] += lookup[id - 1];
 
         // Free the arrays
         free(winning_numbers);
         free(card_numbers);
-        
+
         // Increase the game ID
         id++;
     }

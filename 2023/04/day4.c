@@ -19,7 +19,8 @@ static void get_numbers(char *str, int *arr, size_t *len)
     }
 }
 
-static int get_winning_points(FILE *fptr) {
+static int get_winning_points(FILE *fptr)
+{
     int res = 0;
     char *line = NULL;
     size_t len = 0;
