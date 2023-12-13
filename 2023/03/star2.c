@@ -110,17 +110,11 @@ static void replace_dots(struct grid_info gi, struct number nb)
     {
         if (is_valid_pos(gi, nb.pt.x, nb.pt.y + i))
             gi.grid[nb.pt.x][nb.pt.y + i] = '.';
-        else
-            printf("(%zu, %zu) unreachable\n", nb.pt.x, nb.pt.y);
     }
 }
 
 static struct point search_other_number(struct grid_info gi, struct point gear)
 {
-    printf("Found '*' at (%zu, %zu)!\n", gear.x, gear.y);
-
-    // Check all 8 around the '*' char for the other number
-
     // Check the 3 before
     for (int i = -1; i < 2; ++i)
     {
@@ -230,10 +224,8 @@ static int get_part_numbers(FILE *fptr)
 
                         // Build the other number
                         size_t k = beg + 1;
-
                         while (end - k > 0)
                             n2 = n2 * 10 + (gi.grid[other.x][k++] - '0');
-                        printf("%d\n", n2);
 
                         // Add to the result & remove the asterix & the second
                         // number
@@ -242,8 +234,6 @@ static int get_part_numbers(FILE *fptr)
                             init_number(other.x, beg + 1, end - beg - 1);
                         replace_dots(gi, other_number);
                     }
-                    else
-                        printf("False positive\n");
                 }
             }
         }
